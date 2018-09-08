@@ -16,12 +16,12 @@ module.exports = app => {
   // Your code here
   app.log('Yay, the app was loaded!')
 
-  app.on(['push', 'pull_request.opened', 'pull_request.reopened', 'pull_request.synchronize'], async context => {
+  app.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async context => {
     const push = context.payload
 
     const compare = await context.github.repos.compareCommits(context.repo({
-      base: push.before,
-      head: push.after
+      base: push.pull_request.base.sha,
+      head: push.pull_request.head.sha
     }))
 
     const head_branch = push.pull_request.head.ref;
