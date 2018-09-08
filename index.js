@@ -48,7 +48,7 @@ module.exports = app => {
             if (err) {
               throw new Error(err)
             }
-            return Promise.all(
+            return Promise.all([
               context.github.repos.updateFile(context.repo({
                 path: file.filename,
                 message: `Fix lint errors for ${file.filename}`,
@@ -58,7 +58,7 @@ module.exports = app => {
                 name: '24OI-bot',
                 email: '15963390+24OI-bot@users.noreply.github.com'
               })
-              ))
+            )])
           })
       }
     }))
