@@ -1,3 +1,10 @@
+const remark = require('remark');
+const rguide = require('remark-preset-lint-markdown-style-guide');
+const rpangu = require('remark-pangu');
+const rmath = require('remark-math');
+const rline = require('remark-lint-final-newline');
+const rtab = require('remark-lint-no-tabs');
+
 /**
  * This is the entry point for your Probot App.
  * @param {import('probot').Application} app - Probot's Application class.
