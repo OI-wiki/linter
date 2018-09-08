@@ -40,8 +40,8 @@ module.exports = app => {
           .use(rpangu)
           .use({
             plugins: [rguide, [cbs, false],
-            [mll, false],
-            [olm, "ordered"]]
+              [mll, false],
+              [olm, "ordered"]]
           })
           .use(rmath)
           .use(rline)
@@ -50,17 +50,25 @@ module.exports = app => {
             if (err) {
               throw new Error(err)
             }
-            return Promise.all([
-              context.github.repos.updateFile(context.repo({
-                path: file.filename,
-                message: `style: fix lint errors for ${file.filename}`,
-                content: Buffer.from(output).toString('utf-8'),
-                sha: content.data.sha,
-                branch,
+            console.log(file.filename);
+            return context.github.repos.updateFile({
+              owner: push.pull_request.head.user.login,
+              repo: push.pull_request.head.repo.name,
+              path: file.filename,
+              message: `style: fix lint errors for ${file.filename}`,
+              content: Buffer.from(output).toString('utf-8'),
+              sha: content.data.sha,
+              branch,
+              author: {
                 name: '24OI-bot',
                 email: '15963390+24OI-bot@users.noreply.github.com'
-              })
-            )])
+              }
+            }, (err, res) => {
+              if (err) {
+                throw new Error(err)
+              }
+              console.log(res);
+            })
           })
       }
     }))
