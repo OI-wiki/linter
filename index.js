@@ -33,7 +33,7 @@ module.exports = app => {
           owner: push.pull_request.head.user.login,
           repo: push.pull_request.head.repo.name
         })
-        const text = Buffer.from(content.data.content, 'utf-8').toString()
+        const text = Buffer.from(content.data.content, 'base64').toString()
         // console.log(typeof text)
         // console.log(typeof rmath)
         remark()
@@ -57,7 +57,7 @@ module.exports = app => {
               repo: push.pull_request.head.repo.name,
               path: file.filename,
               message: `style: fix lint errors for ${file.filename}`,
-              content: Buffer.from(output).toString('utf-8'),
+              content: Buffer.from(output).toString('base64'),
               sha: content.data.sha,
               branch,
               author: {
