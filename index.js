@@ -6,7 +6,7 @@ module.exports = app => {
   // Your code here
   app.log('Yay, the app was loaded!')
 
-  app.on.on(['push', 'pull_request.opened', 'pull_request.reopened', 'pull_request.synchronize'], async context => {
+  app.on(['push', 'pull_request.opened', 'pull_request.reopened', 'pull_request.synchronize'], async context => {
     const push = context.payload
 
     const compare = await context.github.repos.compareCommits(context.repo({
