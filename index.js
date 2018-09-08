@@ -51,8 +51,9 @@ module.exports = app => {
               throw new Error(err)
             }
             console.log(file.filename);
-            console.log(outputs);
-            return Promise.all([outputs].map(output => context.github.repos.updateFile({
+            // console.log(outputs);
+            return Promise.all([outputs].map(output => {
+              context.github.repos.updateFile({
               owner: push.pull_request.head.user.login,
               repo: push.pull_request.head.repo.name,
               path: file.filename,
@@ -69,7 +70,7 @@ module.exports = app => {
                 throw new Error(err)
               }
               console.log(res);
-            })))
+            })}))
           })
       }
     }))
