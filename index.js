@@ -37,9 +37,9 @@ module.exports = app => {
         remark()
           .use(rpangu)
           .use({
-            plugins: [rguide, [[cbs, false],
+            plugins: [rguide, [cbs, false],
             [mll, false],
-            [olm, "ordered"]]]
+            [olm, "ordered"]]
           })
           .use(rmath)
           .use(rline)
