@@ -4,6 +4,9 @@ const rpangu = require('remark-pangu');
 const rmath = require('remark-math');
 const rline = require('remark-lint-final-newline');
 const rtab = require('remark-lint-no-tabs');
+const cbs = require("remark-lint-code-block-style");
+const mll = require("remark-lint-maximum-line-length");
+const olm = require("remark-lint-ordered-list-marker-value");
 
 /**
  * This is the entry point for your Probot App.
@@ -34,9 +37,9 @@ module.exports = app => {
         remark()
           .use(rpangu)
           .use({
-            plugins: [rguide, [[require("remark-lint-code-block-style"), false],
-            [require("remark-lint-maximum-line-length"), false],
-            [require("remark-lint-ordered-list-marker-value"), "ordered"]]]
+            plugins: [rguide, [[cbs, false],
+            [mll, false],
+            [olm, "ordered"]]]
           })
           .use(rmath)
           .use(rline)
