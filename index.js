@@ -21,14 +21,15 @@ module.exports = app => {
       head: push.after
     }))
 
-    const branch = push.ref.replace('refs/heads/', '');
+    const branch = push.pull_request.head.ref;
 
     return Promise.all(compare.data.files.map(async file => {
       if (file.filename.endsWith('.md')) {
-        const content = await context.github.repos.getContent(context.repo({
+        const content = await context.github.repos.getContent({
           path: file.filename,
-          ref: branch
-        }))
+          owner: push.pull_request.head.user.login,
+          repo: push.pull_request.head.repo.name
+        })
         const text = Buffer.from(content.data.content, 'utf-8').toString()
         remark()
           .use(rpangu)
