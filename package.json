@@ -1,12 +1,12 @@
 {
-  "name": "lint",
+  "name": "OI-wiki-linter",
   "version": "1.0.0",
   "description": "A Probot app",
   "author": "Ir1d <sirius.caffrey@gmail.com>",
   "license": "ISC",
-  "repository": "https://github.com/Ir1d/lint.git",
-  "homepage": "https://github.com/Ir1d/lint",
-  "bugs": "https://github.com/Ir1d/lint/issues",
+  "repository": "https://github.com/24OI/linter.git",
+  "homepage": "https://github.com/24OI/linter",
+  "bugs": "https://github.com/24OI/linter/issues",
   "keywords": [
     "probot",
     "github",
