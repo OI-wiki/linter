@@ -46,21 +46,26 @@ module.exports = app => {
           .use(rmath)
           .use(rline)
           .use(rtab)
+          .use({
+            "settings": {
+              "listItemIndent": "mixed"
+            }
+          })
           .process(text, (err, outputs) => {
             if (err) {
               throw new Error(err)
             }
-            console.log(file.filename);
+            // console.log(file.filename);
             // console.log(outputs);
             return Promise.all([outputs].map(output => {
-              console.log('??' + output);
-              console.log(typeof output);
+              // console.log('??' + output);
+              // console.log(typeof output);
               context.github.repos.updateFile({
                 owner: push.pull_request.head.user.login,
                 repo: push.pull_request.head.repo.name,
                 path: file.filename,
                 message: `style: fix lint errors for ${file.filename}`,
-                content: Buffer.from(output).toString('base64'),
+                content: output.toString('base64'),
                 sha: content.data.sha,
                 branch: head_branch,
                 author: {
