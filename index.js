@@ -24,7 +24,7 @@ module.exports = app => {
       head: push.after
     }))
 
-    const branch = push.pull_request.head.ref;
+    const head_branch = push.pull_request.head.ref;
 
     return Promise.all(compare.data.files.map(async file => {
       if (file.filename.endsWith('.md')) {
@@ -54,23 +54,24 @@ module.exports = app => {
             // console.log(outputs);
             return Promise.all([outputs].map(output => {
               context.github.repos.updateFile({
-              owner: push.pull_request.head.user.login,
-              repo: push.pull_request.head.repo.name,
-              path: file.filename,
-              message: `style: fix lint errors for ${file.filename}`,
-              content: Buffer.from(output).toString('base64'),
-              sha: content.data.sha,
-              branch,
-              author: {
-                name: '24OI-bot',
-                email: '15963390+24OI-bot@users.noreply.github.com'
-              }
-            }, (err, res) => {
-              if (err) {
-                throw new Error(err)
-              }
-              console.log(res);
-            })}))
+                owner: push.pull_request.head.user.login,
+                repo: push.pull_request.head.repo.name,
+                path: file.filename,
+                message: `style: fix lint errors for ${file.filename}`,
+                content: Buffer.from(output).toString('base64'),
+                sha: content.data.sha,
+                branch: head_branch,
+                author: {
+                  name: '24OI-bot',
+                  email: '15963390+24OI-bot@users.noreply.github.com'
+                }
+              }, (err, res) => {
+                if (err) {
+                  throw new Error(err)
+                }
+                console.log(res);
+              })
+            }))
           })
       }
     }))
