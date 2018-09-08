@@ -1,0 +1,55 @@
+{
+  "name": "lint",
+  "version": "1.0.0",
+  "description": "A Probot app",
+  "author": "Ir1d <sirius.caffrey@gmail.com>",
+  "license": "ISC",
+  "repository": "https://github.com/Ir1d/lint.git",
+  "homepage": "https://github.com/Ir1d/lint",
+  "bugs": "https://github.com/Ir1d/lint/issues",
+  "keywords": [
+    "probot",
+    "github",
+    "probot-app"
+  ],
+  "scripts": {
+    "dev": "nodemon",
+    "start": "probot run ./index.js",
+    "lint": "standard --fix",
+    "test": "jest && standard",
+    "test:watch": "jest --watch --notify --notifyMode=change --coverage"
+  },
+  "dependencies": {
+    "probot": "^7.0.0",
+    "remark": "^9.0.0",
+    "remark-lint-final-newline": "^1.0.2",
+    "remark-lint-no-tabs": "^1.0.2",
+    "remark-math": "^1.0.4",
+    "remark-pangu": "^1.0.1",
+    "remark-preset-lint-markdown-style-guide": "^2.1.2"
+  },
+  "devDependencies": {
+    "jest": "^22.4.3",
+    "nodemon": "^1.17.2",
+    "smee-client": "^1.0.2",
+    "standard": "^10.0.3"
+  },
+  "engines": {
+    "node": ">= 8.3.0"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "nodemonConfig": {
+    "exec": "npm start",
+    "watch": [
+      ".env",
+      "."
+    ]
+  }
+}
