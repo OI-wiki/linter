@@ -34,8 +34,8 @@ module.exports = app => {
           repo: push.pull_request.head.repo.name
         })
         const text = Buffer.from(content.data.content, 'utf-8').toString()
-        console.log(typeof text)
-        console.log(typeof rmath)
+        // console.log(typeof text)
+        // console.log(typeof rmath)
         remark()
           .use(rpangu)
           .use({
@@ -51,6 +51,7 @@ module.exports = app => {
               throw new Error(err)
             }
             console.log(file.filename);
+            console.log(output);
             return context.github.repos.updateFile({
               owner: push.pull_request.head.user.login,
               repo: push.pull_request.head.repo.name,
