@@ -34,6 +34,8 @@ module.exports = app => {
           repo: push.pull_request.head.repo.name
         })
         const text = Buffer.from(content.data.content, 'utf-8').toString()
+        console.log(typeof text)
+        console.log(typeof rmath)
         remark()
           .use(rpangu)
           .use({
@@ -51,7 +53,7 @@ module.exports = app => {
             return Promise.all([
               context.github.repos.updateFile(context.repo({
                 path: file.filename,
-                message: `Fix lint errors for ${file.filename}`,
+                message: `style: fix lint errors for ${file.filename}`,
                 content: Buffer.from(output).toString('utf-8'),
                 sha: content.data.sha,
                 branch,
