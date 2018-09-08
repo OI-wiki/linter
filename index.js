@@ -1,7 +1,12 @@
-const standard = require('standard')
+const remark = require('remark');
+const rguide = require('remark-preset-lint-markdown-style-guide');
+const rpangu = require('remark-pangu');
+const rmath = require('remark-math');
+const rline = require('remark-lint-final-newline');
+const rtab = require('remark-lint-no-tabs');
 
 module.exports = robot => {
-  robot.on('push', async context => {
+  robot.on(['push', 'pull_request.opened', 'pull_request.reopened', 'pull_request.synchronize'], async context => {
     let exclude
     const linterItems = {}
     const push = context.payload
@@ -11,46 +16,41 @@ module.exports = robot => {
       head: push.after
     }))
 
-    const branch = push.ref.replace('refs/heads/', '')
-    // Checks for a config file
-    let config = context.config('linter.yml')
-    // Adds properties to a LinterItem object to be passed to standard.lintText()
-    if (config) {
-      for (const property in config) {
-        if (property === 'exclude') {
-          exclude = config[property]
-        } else {
-          linterItems[property] = config[property]
-        }
-      }
-    }
+    const branch = push.ref.replace('refs/heads/', '');
 
     return Promise.all(compare.data.files.map(async file => {
-      if (!exclude.includes(file.filename)) {
+      if (file.filename.endsWith('.md')) {
         const content = await context.github.repos.getContent(context.repo({
           path: file.filename,
           ref: branch
         }))
-        const text = Buffer.from(content.data.content, 'base64').toString()
-        Object.assign(linterItems, {cwd: '', fix: true, filename: file.filename})
-
-        standard.lintText(text, linterItems, (err, results) => {
-          if (err) {
-            throw new Error(err)
-          }
-          return Promise.all(results.results.map(result => {
-            if (result.output) {
-              // Checks that we have a fixed version and the file isn't part of the exclude list
+        const text = Buffer.from(content.data.content, 'utf-8').toString()
+        remark()
+          .use(rpangu)
+          .use({
+            plugins: [rguide, [[require("remark-lint-code-block-style"), false],
+            [require("remark-lint-maximum-line-length"), false],
+            [require("remark-lint-ordered-list-marker-value"), "ordered"]]]
+          })
+          .use(rmath)
+          .use(rline)
+          .use(rtab)
+          .process(text, (err, output) => {
+            if (err) {
+              throw new Error(err)
+            }
+            return Promise.all(
               context.github.repos.updateFile(context.repo({
                 path: file.filename,
                 message: `Fix lint errors for ${file.filename}`,
-                content: Buffer.from(result.output).toString('base64'),
+                content: Buffer.from(output).toString('utf-8'),
                 sha: content.data.sha,
-                branch
-              }))
-            }
-          }))
-        })
+                branch,
+                name: '24OI-bot',
+                email: '15963390+24OI-bot@users.noreply.github.com'
+              })
+              ))
+          })
       }
     }))
   })

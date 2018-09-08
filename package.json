@@ -1,5 +1,5 @@
 {
-  "name": "probot-linter",
+  "name": "OI-wiki-linter",
   "version": "1.0.0",
   "description": "automatically lints code",
   "contributors": [
@@ -8,17 +8,25 @@
     },
     {
       "name": "Brandon Keepers"
+    },
+    {
+      "name": "Ir1d"
     }
   ],
   "license": "ISC",
-  "repository": "https://github.com/probot/linter.git",
+  "repository": "https://github.com/24OI/linter.git",
   "scripts": {
     "start": "probot run ./index.js",
-    "test": "standard"
+    "now-start": "PRIVATE_KEY=$(echo $PRIVATE_KEY_BASE64 | base64 -d) npm start"
   },
   "dependencies": {
     "probot": "^0.11.0",
-    "standard": "^10.0.2"
+    "remark": "^9.0.0",
+    "remark-lint-final-newline": "^1.0.2",
+    "remark-lint-no-tabs": "^1.0.2",
+    "remark-math": "^1.0.4",
+    "remark-pangu": "^1.0.1",
+    "remark-preset-lint-markdown-style-guide": "^2.1.2"
   },
   "devDependencies": {
     "expect": "^1.20.2",
@@ -28,10 +36,5 @@
   "engines": {
     "node": ">= 7.7.0",
     "npm": ">= 4.0.0"
-  },
-  "standard": {
-    "env": [
-      "mocha"
-    ]
   }
 }
