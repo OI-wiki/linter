@@ -8,6 +8,12 @@ const cbs = require("remark-lint-code-block-style");
 const mll = require("remark-lint-maximum-line-length");
 const olm = require("remark-lint-ordered-list-marker-value");
 
+console.log(context.payload.installation.id)
+
+const asApp = await app.auth()
+const forkInstallation = await asApp.findRepoInstallation({ owner: 'Ir1d', repo: 'OI-wiki' })
+console.log(forkInstallation.data.id)
+
 /**
  * This is the entry point for your Probot App.
  * @param {import('probot').Application} app - Probot's Application class.
