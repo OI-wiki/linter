@@ -1,4 +1,5 @@
 #!/bin/bash
+echo $UID
 source /root/.bashrc
 
 rm -rf 24OI/OI-wiki
