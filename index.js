@@ -40,7 +40,7 @@ webhooks.on('error', (error) => {
   console.log(`Error occured in "${error.event.name} handler: ${error.stack}"`)
 })
 
-webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], ({ id, name, payload }) => {
+webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async ({ id, name, payload }) => {
   console.log(name, 'event received');
   const push = payload;
 
