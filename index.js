@@ -9,6 +9,11 @@ const cbs = require("remark-lint-code-block-style");
 const mll = require("remark-lint-maximum-line-length");
 const olm = require("remark-lint-ordered-list-marker-value");
 
+octokit.authenticate({
+  type: 'token',
+  token: process.env.GH_TOKEN
+})
+
 const myremark = remark()
   .use(rpangu)
   .use({
@@ -48,10 +53,6 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async (
 
   const head_branch = push.pull_request.head.ref;
 
-  octokit.authenticate({
-    type: 'token',
-    token: process.env.GH_TOKEN
-  })
   compare.data.files.map(async file => {
     if (file.filename.endsWith('.md')) {
       const content = await octokit.repos.getContent({
@@ -91,11 +92,7 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async (
             message: `style: fix lint errors for ${file.filename}`,
             content: output.toString('base64'),
             sha: content.data.sha,
-            branch: head_branch,
-            author: {
-              name: '24OI-bot',
-              email: '15963390+24OI-bot@users.noreply.github.com'
-            }
+            branch: head_branch
           }, (err, res) => {
             if (err) {
               throw new Error(err)
