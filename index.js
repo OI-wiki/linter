@@ -10,7 +10,7 @@ const mll = require("remark-lint-maximum-line-length");
 const olm = require("remark-lint-ordered-list-marker-value");
 
 octokit.authenticate({
-  type: 'token',
+  type: 'oauth',
   token: process.env.GH_TOKEN
 })
 
@@ -92,7 +92,11 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async (
             message: `style: fix lint errors for ${file.filename}`,
             content: output.toString('base64'),
             sha: content.data.sha,
-            branch: head_branch
+            branch: head_branch,
+            author: {
+              name: '24OI-bot',
+              email: '15963390+24OI-bot@users.noreply.github.com'
+            }
           }, (err, res) => {
             if (err) {
               throw new Error(err)
