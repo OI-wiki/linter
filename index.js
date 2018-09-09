@@ -53,8 +53,8 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async (
   //   base: push.pull_request.base.sha,
   //   head: push.pull_request.head.sha
   // })
-  const pr_owner = push.pull_request.base.user.login;
-  const pr_repo = push.pull_request.base.repo.name;
+  const pr_owner = push.pull_request.head.user.login;
+  const pr_repo = push.pull_request.head.repo.name;
   const head_branch = push.pull_request.head.ref;
   const pr_number = push.number;
   console.log('lint starts');
