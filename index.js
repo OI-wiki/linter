@@ -69,6 +69,19 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async (
           throw new Error(err)
         }
         // console.log(outputs);
+        console.log({
+          owner: push.pull_request.head.user.login,
+          repo: push.pull_request.head.repo.name,
+          path: file.filename,
+          message: `style: fix lint errors for ${file.filename}`,
+          content: output.toString('base64'),
+          sha: content.data.sha,
+          branch: head_branch,
+          author: {
+            name: '24OI-bot',
+            email: '15963390+24OI-bot@users.noreply.github.com'
+          }
+        })
         return Promise.all([outputs].map(output => {
           // console.log('??' + output);
           // console.log(typeof output);
