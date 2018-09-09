@@ -55,7 +55,7 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async (
   const head_branch = push.pull_request.head.ref;
   const pr_number = push.number;
   console.log('lint starts');
-  exec(`"./lint.sh" ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`(error, stdout, stderr) => {
+  exec(`"./lint.sh" ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`, (error, stdout, stderr) => {
     if(error) {
       console.error(`exec error: ${error}`);
       return;
