@@ -8,11 +8,6 @@ const cbs = require("remark-lint-code-block-style");
 const mll = require("remark-lint-maximum-line-length");
 const olm = require("remark-lint-ordered-list-marker-value");
 
-console.log(context.payload.installation.id)
-
-const asApp = await app.auth()
-const forkInstallation = await asApp.findRepoInstallation({ owner: 'Ir1d', repo: 'OI-wiki' })
-console.log(forkInstallation.data.id)
 
 /**
  * This is the entry point for your Probot App.
@@ -23,6 +18,12 @@ module.exports = app => {
   app.log('Yay, the app was loaded!')
 
   app.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async context => {
+    console.log(context.payload.installation.id)
+
+    const asApp = await app.auth()
+    const forkInstallation = await asApp.findRepoInstallation({ owner: 'Ir1d', repo: 'OI-wiki' })
+    console.log(forkInstallation.data.id)
+
     const push = context.payload
 
     const compare = await context.github.repos.compareCommits(context.repo({
