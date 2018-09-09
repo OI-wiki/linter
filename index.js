@@ -21,7 +21,7 @@ module.exports = app => {
     console.log(context.payload.installation.id)
 
     const asApp = await app.auth()
-    const forkInstallation = await asApp.findRepoInstallation({ owner: 'Ir1d', repo: 'OI-wiki' })
+    const forkInstallation = await asApp.apps.findRepoInstallation({ owner: 'Ir1d', repo: 'OI-wiki' })
     console.log(forkInstallation.data.id)
 
     const push = context.payload
