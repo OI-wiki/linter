@@ -60,9 +60,7 @@ module.exports = app => {
             return Promise.all([outputs].map(output => {
               // console.log('??' + output);
               // console.log(typeof output);
-              context.github.repos.updateFile({
-                owner: push.pull_request.head.user.login,
-                repo: push.pull_request.head.repo.name,
+              context.github.repos.updateFile(context.repo({
                 path: file.filename,
                 message: `style: fix lint errors for ${file.filename}`,
                 content: output.toString('base64'),
@@ -72,7 +70,7 @@ module.exports = app => {
                   name: '24OI-bot',
                   email: '15963390+24OI-bot@users.noreply.github.com'
                 }
-              }, (err, res) => {
+              }), (err, res) => {
                 if (err) {
                   throw new Error(err)
                 }
