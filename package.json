@@ -20,6 +20,8 @@
     "test:watch": "jest --watch --notify --notifyMode=change --coverage"
   },
   "dependencies": {
+    "@octokit/rest": "^15.11.1",
+    "@octokit/webhooks": "^5.0.0",
     "probot": "^7.0.0",
     "remark": "^9.0.0",
     "remark-lint-final-newline": "^1.0.2",
