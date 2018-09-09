@@ -1,4 +1,6 @@
 #!/bin/bash
+source /root/.bashrc
+
 rm -rf 24OI/OI-wiki
 git clone --depth=50 https://github.com/24OI/OI-wiki.git 24OI/OI-wiki
 
