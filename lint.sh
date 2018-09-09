@@ -13,5 +13,5 @@ remark . -o
 
 git add .
 git commit -m 'style: format markdown files with remark-lint'
-git remote add upd https://github.com/$1/$2.git
+git remote add upd https://24OI-bot:$GH_TOKEN@github.com/$1/$2.git
 git push upd $3
