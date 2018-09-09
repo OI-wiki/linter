@@ -74,7 +74,7 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async (
           repo: push.pull_request.head.repo.name,
           path: file.filename,
           message: `style: fix lint errors for ${file.filename}`,
-          content: output.toString('base64'),
+          content: outputs.toString('base64'),
           sha: content.data.sha,
           branch: head_branch,
           author: {
