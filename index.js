@@ -9,11 +9,6 @@ const cbs = require("remark-lint-code-block-style");
 const mll = require("remark-lint-maximum-line-length");
 const olm = require("remark-lint-ordered-list-marker-value");
 
-octokit.authenticate({
-  type: 'token',
-  token: process.env.GH_TOKEN
-})
-
 const myremark = remark()
   .use(rpangu)
   .use({
@@ -53,6 +48,10 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async (
 
   const head_branch = push.pull_request.head.ref;
 
+  octokit.authenticate({
+    type: 'token',
+    token: process.env.GH_TOKEN
+  })
   compare.data.files.map(async file => {
     if (file.filename.endsWith('.md')) {
       const content = await octokit.repos.getContent({
