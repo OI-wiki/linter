@@ -6,6 +6,8 @@ cd 24OI/OI-wiki
 git fetch origin +refs/pull/$4/merge:
 git checkout -qf FETCH_HEAD
 
+npm install .
+
 git config --local user.email "15963390+24OI-bot@users.noreply.github.com"
 git config --local user.name "24OI-bot"
 

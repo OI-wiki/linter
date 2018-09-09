@@ -24,6 +24,8 @@
     "@octokit/webhooks": "^5.0.0",
     "probot": "^7.0.0",
     "remark": "^9.0.0",
+    "remark-cli": "^5.0.0",
+    "remark-lint": "^6.0.2",
     "remark-lint-final-newline": "^1.0.2",
     "remark-lint-no-tabs": "^1.0.2",
     "remark-math": "^1.0.4",
