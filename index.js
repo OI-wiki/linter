@@ -10,7 +10,7 @@ const mll = require("remark-lint-maximum-line-length");
 const olm = require("remark-lint-ordered-list-marker-value");
 
 octokit.authenticate({
-  type: 'oauth',
+  type: 'token',
   token: process.env.GH_TOKEN
 })
 
