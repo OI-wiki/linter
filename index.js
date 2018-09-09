@@ -63,11 +63,11 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async (
       const text = Buffer.from(content.data.content, 'base64').toString()
       // console.log(typeof text)
       // console.log(typeof rmath)
+      console.log(file.filename);
       myremark.process(text, (err, outputs) => {
         if (err) {
           throw new Error(err)
         }
-        // console.log(file.filename);
         // console.log(outputs);
         return Promise.all([outputs].map(output => {
           // console.log('??' + output);
