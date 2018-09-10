@@ -43,6 +43,8 @@ webhooks.on('error', (error) => {
 
 const { exec } = require('child_process');
 
+let env_variables = 'PATH=' + process.env.PATH;
+
 webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async ({ id, name, payload }) => {
   console.log(name, 'event received');
   const push = payload;
@@ -58,7 +60,7 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async (
   const head_branch = push.pull_request.head.ref;
   const pr_number = push.number;
   console.log('lint starts');
-  exec(`bash ./lint.sh ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`, {env: {'GH_TOKEN': process.env.GH_TOKEN}, uid: 0}, (error, stdout, stderr) => {
+  exec(env_variables + `bash ./lint.sh ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`, {env: {'GH_TOKEN': process.env.GH_TOKEN}, uid: 0}, (error, stdout, stderr) => {
     console.log(`stdout: ${stdout}`);
     if(error) {
       console.error(`exec error: ${error}`);
