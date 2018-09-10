@@ -14,7 +14,7 @@ npm install .
 git config --local user.email "15963390+24OI-bot@users.noreply.github.com"
 git config --local user.name "24OI-bot"
 
-remark . -o
+remark . -o --silent
 
 git add .
 git commit -m 'style: format markdown files with remark-lint'
