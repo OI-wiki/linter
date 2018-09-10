@@ -55,8 +55,8 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async (
     const pr_number = push.number;
     console.log('lint starts');
     exec(env_variables + `bash ./lint.sh ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`, { env: { 'GH_TOKEN': process.env.GH_TOKEN }, uid: 0, maxBuffer: 1024 * 500}, (error, stdout, stderr) => {
-      console.log(`stdout: ${stdout}`);
-      console.log(`stderr: ${stderr}`);
+      // console.log(`stdout: ${stdout}`);
+      // console.log(`stderr: ${stderr}`);
       if(error) {
         console.error(`exec error: ${error}`);
         return;
