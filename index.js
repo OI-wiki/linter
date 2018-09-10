@@ -48,6 +48,24 @@ let env_variables = 'PATH=' + process.env.PATH;
 webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async ({ id, name, payload }) => {
   console.log(name, 'event received');
   const push = payload;
+  if (push.pull_request.title.indexOf(substr) > -1) {
+    const pr_owner = push.pull_request.head.user.login;
+    const pr_repo = push.pull_request.head.repo.name;
+    const head_branch = push.pull_request.head.ref;
+    const pr_number = push.number;
+    console.log('lint starts');
+    exec(env_variables + `bash ./lint.sh ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`, { env: { 'GH_TOKEN': process.env.GH_TOKEN }, uid: 0, maxBuffer: 1024 * 500}, (error, stdout, stderr) => {
+      console.log(`stdout: ${stdout}`);
+      console.log(`stderr: ${stderr}`);
+      if(error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+      console.log('lint finishes');
+    });
+  } else {
+    console.log('lint skipped');
+  }
 
   // const compare = await octokit.repos.compareCommits({
   //   owner: push.pull_request.base.user.login,
@@ -55,20 +73,6 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async (
   //   base: push.pull_request.base.sha,
   //   head: push.pull_request.head.sha
   // })
-  const pr_owner = push.pull_request.head.user.login;
-  const pr_repo = push.pull_request.head.repo.name;
-  const head_branch = push.pull_request.head.ref;
-  const pr_number = push.number;
-  console.log('lint starts');
-  exec(env_variables + `bash ./lint.sh ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`, { env: { 'GH_TOKEN': process.env.GH_TOKEN }, uid: 0, maxBuffer: 1024 * 500}, (error, stdout, stderr) => {
-    console.log(`stdout: ${stdout}`);
-    console.log(`stderr: ${stderr}`);
-    if(error) {
-      console.error(`exec error: ${error}`);
-      return;
-    }
-    console.log('lint finishes');
-  });
 
   // compare.data.files.map(async file => {
   //   if (file.filename.endsWith('.md')) {
