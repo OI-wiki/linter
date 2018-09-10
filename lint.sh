@@ -5,11 +5,9 @@ echo $PATH
 source /root/.bashrc
 
 rm -rf 24OI/OI-wiki
-git clone --depth=50 https://github.com/24OI/OI-wiki.git 24OI/OI-wiki
+git clone --depth=1 -b $3 https://github.com/$1/$2.git 24OI/OI-wiki
 
 cd 24OI/OI-wiki
-git fetch origin +refs/pull/$4/merge:
-git checkout -qf FETCH_HEAD
 
 npm install .
 
