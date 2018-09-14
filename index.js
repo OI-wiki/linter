@@ -48,7 +48,7 @@ let env_variables = 'PATH=' + process.env.PATH;
 webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async ({ id, name, payload }) => {
   console.log(name, 'event received');
   const push = payload;
-  if (push.pull_request && push.pull_request.title.indexOf('[lint skip]') < 0 && push.pull_request.commits[0].author.name != "24OI-bot") {
+  if (push.pull_request && push.pull_request.title.indexOf('[lint skip]') < 0 && push.sender.login != "24OI-bot") {
     const pr_owner = push.pull_request.head.user.login;
     const pr_repo = push.pull_request.head.repo.name;
     const head_branch = push.pull_request.head.ref;
