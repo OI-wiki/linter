@@ -4,10 +4,10 @@ echo $USER
 echo $PATH
 source /root/.bashrc
 
-rm -rf 24OI/OI-wiki
-git clone --depth=1 -b $3 https://github.com/$1/$2.git 24OI/OI-wiki
+num=$RANDOM
+git clone --depth=1 -b $3 https://github.com/$1/$2.git $num
 
-cd 24OI/OI-wiki
+cd $num
 
 npm install .
 
@@ -20,3 +20,6 @@ git add .
 git commit -m 'style: format markdown files with remark-lint'
 git remote add upd https://24OI-bot:$GH_TOKEN@github.com/$1/$2.git
 git push upd $3
+
+cd ..
+rm -rf $num
