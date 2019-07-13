@@ -1,23 +1,10 @@
 # lint
 
-> A GitHub App built with [Probot](https://probot.github.io) that A Probot app
+## Usage
 
-## Setup
-
-```sh
-# Install dependencies
-npm install
-
-# Run the bot
-npm start
-```
-
-## Contributing
-
-If you have suggestions for how lint could be improved, or want to report a bug, open an issue! We'd love all and any contributions.
-
-For more, check out the [Contributing Guide](CONTRIBUTING.md).
+- requries `remark-lint`, `clang-format`
+- customize `remark-clang-format`
 
 ## License
 
-[ISC](LICENSE) © 2018 Ir1d <sirius.caffrey@gmail.com>
+[MIT](LICENSE) © 2018 Ir1d <sirius.caffrey@gmail.com>
