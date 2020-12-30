@@ -16,7 +16,7 @@ git config --local user.name "24OI-bot"
 
 remark ./docs -o --silent
 
-git add .
+git add ./docs
 git commit -m 'style: format markdown files with remark-lint'
 git remote add upd https://24OI-bot:$GH_TOKEN@github.com/$1/$2.git
 git push upd $3
