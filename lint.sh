@@ -15,6 +15,7 @@ git config --local user.email "15963390+24OI-bot@users.noreply.github.com"
 git config --local user.name "24OI-bot"
 
 npx remark ./docs -o --silent
+find . -type f -name "*.cpp" | xargs clang-format -i
 
 git add ./docs
 git commit -m 'style: format markdown files with remark-lint'
