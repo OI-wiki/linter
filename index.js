@@ -45,10 +45,13 @@ const { exec } = require('child_process');
 
 let env_variables = 'PATH=' + process.env.PATH;
 
-webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize'], async ({ id, name, payload }) => {
-  console.log(name, 'event received');
+webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize', 'pull_request.review_requested'], async ({ id, name, payload }) => {
   const push = payload;
   if (push.pull_request && push.pull_request.title.indexOf('[lint skip]') < 0 && push.sender.login != "24OI-bot") {
+  	console.log(name, 'event received', push.pull_request.html_url);
+		if (push.pull_request.review_requested && push.pull_request.requested_reviewers && !push.pull_request.requested_reviewers.includes("24OI-bot")) {
+			return;
+		}
     const pr_owner = push.pull_request.head.user.login;
     const pr_repo = push.pull_request.head.repo.name;
     const head_branch = push.pull_request.head.ref;
