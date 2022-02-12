@@ -1,5 +1,7 @@
 require('log-timestamp');
-const octokit = require('@octokit/rest')()
+// const Octokit = require('@octokit/rest')()
+const { Octokit } = require("@octokit/core");
+const fetch = require('node-fetch');
 const remark = require('remark');
 const rguide = require('remark-preset-lint-markdown-style-guide');
 const rpangu = require('remark-pangu');
@@ -10,10 +12,15 @@ const cbs = require("remark-lint-code-block-style");
 const mll = require("remark-lint-maximum-line-length");
 const olm = require("remark-lint-ordered-list-marker-value");
 
-octokit.authenticate({
-  type: 'token',
-  token: process.env.GH_TOKEN
-})
+// Octokit.authenticate({
+//   type: 'token',
+//   token: process.env.GH_TOKEN
+// })
+
+const octokit = new Octokit({
+  auth: process.env.GH_TOKEN,
+});
+
 
 const myremark = remark()
   .use(rpangu)
@@ -66,14 +73,13 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize', 'pull_re
       console.log(`lint finishes ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`);
     });
   } else {
-    console.log(`lint skipped ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`);
+    console.log(`lint skipped`);
   }
 })
 
 webhooks.on(
   [
     "issue_comment.created",
-    "issue_comment",
     "issue_comment.deleted",
     "issue_comment.edited",
   ],
@@ -82,6 +88,16 @@ webhooks.on(
     const comment_body = payload.comment.body;
     if (comment_body.includes("@24OI-bot") && comment_body.includes("please")) {
       const api_url = payload.issue.pull_request.url;
+      try {
+        await octokit.request('POST /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions', {
+          owner: 'OI-wiki',
+          repo: 'OI-wiki',
+          comment_id: payload.comment.id,
+          content: 'eyes'
+        })
+      } catch (err) {
+        console.error(err)
+      }
       fetch(api_url)
         .then((res) => res.text())
         .then((text) => {
@@ -101,17 +117,39 @@ webhooks.on(
               uid: 0,
               maxBuffer: 1024 * 500,
             },
-            (error, stdout, stderr) => {
+            async (error, stdout, stderr) => {
               if (error) {
                 console.error(`exec error: ${error}`);
+                try {
+                  await octokit.request('POST /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions', {
+                    owner: 'OI-wiki',
+                    repo: 'OI-wiki',
+                    comment_id: payload.comment.id,
+                    content: 'confused'
+                  })
+                } catch (err) {
+                  console.error(err)
+                }
                 return;
               }
               console.log(
                 `manual relint finishes ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`
               );
+              try {
+                await octokit.request('POST /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions', {
+                  owner: 'OI-wiki',
+                  repo: 'OI-wiki',
+                  comment_id: payload.comment.id,
+                  content: '+1'
+                })
+              } catch (err) {
+                console.error(err)
+              }
             }
           );
         });
+    } else {
+      console.log('issue event skipped')
     }
   }
 );
