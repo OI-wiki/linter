@@ -23,6 +23,7 @@
     "@octokit/rest": "^15.11.1",
     "@octokit/webhooks": "^5.0.0",
     "log-timestamp": "^0.3.0",
+    "node-fetch": "^2.6.7",
     "probot": "^7.0.0",
     "remark": "^9.0.0",
     "remark-cli": "^5.0.0",
