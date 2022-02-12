@@ -14,9 +14,10 @@ npm install .
 git config --local user.email "15963390+24OI-bot@users.noreply.github.com"
 git config --local user.name "24OI-bot"
 
-remark ./docs -o --silent
+npx remark ./docs -o --silent
+find . -type f -name "*.cpp" | xargs clang-format -i
 
-git add .
+git add ./docs
 git commit -m 'style: format markdown files with remark-lint'
 git remote add upd https://24OI-bot:$GH_TOKEN@github.com/$1/$2.git
 git push upd $3
