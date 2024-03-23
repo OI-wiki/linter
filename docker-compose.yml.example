@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  wiki-linter:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: "production"
+      GH_TOKEN: "ghp_11111111111111111111111111111111111"
+      WEBHOOK_SECRET: "1231145141919810"
+    volumes:
+      - ./clang-format:/usr/local/bin/clang-format
+      # get it here https://github.com/muttleyxd/clang-tools-static-binaries
