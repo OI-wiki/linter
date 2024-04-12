@@ -134,6 +134,24 @@ webhooks.on(
   }
 );
 
-// require('http').createServer(webhooks.middleware).listen(3000)
-require("http").createServer(createNodeMiddleware(webhooks, { path: "/" })).listen(3000);
+const port = 3000;
+
+const middleware = createNodeMiddleware(webhooks, { path: "/" });
+require("http").createServer()
+  .on("error", (err) => {
+    console.error(err);
+  })
+  .on("listening", () => {
+    console.log(`Listening on port ${port}`);
+  })
+  .on("request", async (req, res) => {
+    if (req.url === "/") {
+      res.statusCode = 200;
+      res.end("Hello, world!");
+      res.end();
+    } else {
+      await middleware(req, res);
+    }
+  })
+  .listen(port);
 
