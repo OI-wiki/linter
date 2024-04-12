@@ -36,17 +36,17 @@ let env_variables = 'PATH=' + process.env.PATH;
 webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize', 'pull_request.review_requested'], async ({ id, name, payload }) => {
   const push = payload;
   if (push.pull_request && push.pull_request.title.indexOf('[lint skip]') < 0 && push.sender.login != "24OI-bot") {
-  	console.log(name, 'pr event received', push.pull_request.html_url);
-		if (push.pull_request.review_requested && push.pull_request.requested_reviewers && !push.pull_request.requested_reviewers.includes("24OI-bot")) {
-			return;
-		}
+    console.log(name, 'pr event received', push.pull_request.html_url);
+    if (push.pull_request.review_requested && push.pull_request.requested_reviewers && !push.pull_request.requested_reviewers.includes("24OI-bot")) {
+      return;
+    }
     const pr_owner = push.pull_request.head.user.login;
     const pr_repo = push.pull_request.head.repo.name;
     const head_branch = push.pull_request.head.ref;
     const pr_number = push.number;
     console.log(`lint starts ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`);
-    exec(env_variables + `bash ./lint.sh ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`, { env: { 'GH_TOKEN': process.env.GH_TOKEN }, uid: 0, maxBuffer: 1024 * 500}, (error, stdout, stderr) => {
-      if(error) {
+    exec(env_variables + `bash ./lint.sh ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`, { env: { 'GH_TOKEN': process.env.GH_TOKEN }, uid: 0, maxBuffer: 1024 * 500 }, (error, stdout, stderr) => {
+      if (error) {
         console.error(`exec error: ${error}`);
         return;
       }
@@ -91,7 +91,7 @@ webhooks.on(
           );
           exec(
             env_variables +
-              `bash ./lint.sh ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`,
+            `bash ./lint.sh ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`,
             {
               env: { GH_TOKEN: process.env.GH_TOKEN },
               uid: 0,
@@ -145,7 +145,7 @@ require("http").createServer()
     console.log(`Listening on port ${port}`);
   })
   .on("request", async (req, res) => {
-    if (req.url === "/") {
+    if (req.url === "/" && req.method === "GET") {
       res.statusCode = 200;
       res.end("Hello, world!");
       res.end();
