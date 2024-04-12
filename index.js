@@ -145,7 +145,7 @@ require("http").createServer()
     console.log(`Listening on port ${port}`);
   })
   .on("request", async (req, res) => {
-    if (req.url === "/" && req.method === "GET") {
+    if (req.url === "/health") {
       res.statusCode = 200;
       res.end("Hello, world!");
       res.end();
