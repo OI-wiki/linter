@@ -55,7 +55,7 @@ async function execLint(owner, repo, branch, number) {
   try {
     await asyncExec(`bash ./lint.sh ${owner} ${repo} ${branch} ${number}`, { env: { 'GH_TOKEN': process.env.GH_TOKEN }, uid: 0, maxBuffer: 1024 * 500 });
     console.log(`lint finishes for ${owner}/${repo}#${number}`);
-    await approveWithComment(owner, repo, number, 'Lint finished, ready for review :)');
+    await approveWithComment('OI-wiki', 'OI-wiki', number, 'Lint finished, ready for review :)');
     return true;
   } catch (err) {
     console.error(err);
