@@ -74,7 +74,9 @@ let env_variables = 'PATH=' + process.env.PATH;
 
 webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize', 'pull_request.review_requested'], async ({ id, name, payload }) => {
   const push = payload;
-  if (push.pull_request && push.pull_request.title.indexOf('[lint skip]') < 0 && push.sender.login != "24OI-bot") {
+  const skipInTitle = push.pull_request.title.indexOf('[lint skip]') >= 0;
+  const skipSelf = push.sender.login == "24OI-bot";
+  if (push.pull_request && !skipInTitle && !skipSelf) {
     console.log(name, 'pr event received', push.pull_request.html_url);
     if (push.pull_request.review_requested && push.pull_request.requested_reviewers && !push.pull_request.requested_reviewers.includes("24OI-bot")) {
       return;
@@ -87,10 +89,12 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize', 'pull_re
     await execLint(pr_owner, pr_repo, head_branch, pr_number)
   } else {
     console.log(`lint skipped`);
-    try {
-      await approveWithComment('OI-wiki', 'OI-wiki', push.number, 'Lint skipped, unhappy :(');
-    } catch (err) {
-      console.error(err)
+    if (skipInTitle) {
+      try {
+        await approveWithComment('OI-wiki', 'OI-wiki', push.number, 'Lint skipped, unhappy :(');
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 })
