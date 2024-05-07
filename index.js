@@ -70,7 +70,7 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize', 'pull_re
         owner: 'OI-wiki',
         repo: 'OI-wiki',
         pull_number: pr_number,
-        body: 'Lint skip, unhappy :(',
+        body: 'Lint skipped, unhappy :(',
         event: 'APPROVE'
       })
     } catch (err) {
