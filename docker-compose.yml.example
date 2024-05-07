@@ -11,3 +11,5 @@ services:
     volumes:
       - ./clang-format:/usr/local/bin/clang-format
       # get it here https://github.com/muttleyxd/clang-tools-static-binaries
+      - ./ruff:/usr/local/bin/ruff
+      # get it here https://github.com/astral-sh/ruff/releases/tag/v0.4.3
