@@ -26,7 +26,7 @@ fi
 git config --local user.email "15963390+24OI-bot@users.noreply.github.com"
 git config --local user.name "24OI-bot"
 
-npx remark ./docs -o --silent
+yarn run remark ./docs -o --silent
 find . -type f -name "*.cpp" | xargs clang-format -i
 # find . -type f -name "*.hpp" | xargs clang-format -i
 
