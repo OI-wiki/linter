@@ -100,12 +100,7 @@ webhooks.on(
     if (comment_body.includes("@24OI-bot") && comment_body.includes("please")) {
       const api_url = payload.issue.pull_request.url;
       try {
-        await octokit.request('POST /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions', {
-          owner: 'OI-wiki',
-          repo: 'OI-wiki',
-          comment_id: payload.comment.id,
-          content: 'eyes'
-        })
+        await postReactions('OI-wiki', 'OI-wiki', payload.comment.id, 'eyes');
       } catch (err) {
         console.error(err)
       }
@@ -118,11 +113,6 @@ webhooks.on(
       console.log(
         `manual relint starts ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`
       );
-      try {
-        postReactions('OI-wiki', 'OI-wiki', payload.comment.id, 'confused');
-      } catch (err) {
-        console.error(err)
-      }
       const success = await execLint(pr_owner, pr_repo, head_branch, pr_number);
       if (success) {
         try {
