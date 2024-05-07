@@ -53,8 +53,10 @@ async function postReactions(owner, repo, comment_id, content) {
 
 async function execLint(owner, repo, branch, number) {
   try {
-    await asyncExec(`bash ./lint.sh ${owner} ${repo} ${branch} ${number}`, { env: { 'GH_TOKEN': process.env.GH_TOKEN }, uid: 0, maxBuffer: 1024 * 500 });
+    const { stdout, stderr } = await asyncExec(`bash ./lint.sh ${owner} ${repo} ${branch} ${number}`, { env: { 'GH_TOKEN': process.env.GH_TOKEN }, uid: 0, maxBuffer: 1024 * 500 });
     console.log(`lint finishes for ${owner}/${repo}#${number}`);
+    console.log(stdout);
+    console.error(stderr);
     await approveWithComment('OI-wiki', 'OI-wiki', number, 'Lint finished, ready for review :)');
     return true;
   } catch (err) {
