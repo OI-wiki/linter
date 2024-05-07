@@ -58,13 +58,24 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize', 'pull_re
         repo: 'OI-wiki',
         pull_number: pr_number,
         body: 'Lint finished, ready for review :)',
-        event : 'APPROVE'
+        event: 'APPROVE'
       })
     } catch (err) {
       console.error(err)
     }
   } else {
     console.log(`lint skipped`);
+    try {
+      await octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
+        owner: 'OI-wiki',
+        repo: 'OI-wiki',
+        pull_number: pr_number,
+        body: 'Lint skip, unhappy :(',
+        event: 'APPROVE'
+      })
+    } catch (err) {
+      console.error(err)
+    }
   }
 })
 
