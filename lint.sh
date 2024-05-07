@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euxo pipefail
+set -exo pipefail
 echo $UID
 echo $USER
 echo $PATH
