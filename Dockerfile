@@ -6,7 +6,8 @@ RUN apt-get update && \
     apt-get install -y git python3 pipx && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    pipx install clang-format==18.1.5 ruff==0.4.4 && \
+    pipx install clang-format==18.1.5 && \
+    pipx install ruff==0.4.4 && \
     rm -rf /root/.cache/pip
 
 # 设置工作目录
