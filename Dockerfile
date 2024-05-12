@@ -3,7 +3,7 @@ FROM node:18
 
 # Install git and clang-format==18.1.5 ruff==0.4.4 from pypi then clean up
 RUN apt-get update && \
-    apt-get install -y git python3.9 python3-pip && \
+    apt-get install -y git python3 python3-pip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     pip3 install clang-format==18.1.5 ruff==0.4.4 && \
