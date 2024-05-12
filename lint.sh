@@ -1,4 +1,5 @@
 #!/bin/bash
+export PATH=$PATH:~/.local/bin
 set -xo pipefail
 echo $UID
 echo $USER
