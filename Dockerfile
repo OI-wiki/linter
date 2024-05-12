@@ -1,10 +1,14 @@
 # 使用官方Node.js作为父镜像
 FROM node:18
 
+# Install git and clang-format==18.1.5 ruff==0.4.4 from pypi then clean up
 RUN apt-get update && \
-    apt-get install -y git && \
+    apt-get install -y git python3.9 python3-pip && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    pip3 install clang-format==18.1.5 ruff==0.4.4 && \
+    rm -rf /root/.cache/pip
+
 # 设置工作目录
 WORKDIR /usr/src/app
 
