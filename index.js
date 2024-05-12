@@ -62,7 +62,6 @@ async function execLint(owner, repo, branch, number) {
     console.log(`lint finishes for ${owner}/${repo}#${number}`);
     console.log(stdout);
     console.error(stderr);
-    await approveWithComment('OI-wiki', 'OI-wiki', number, 'Lint finished, ready for review :)');
     return true;
   } catch (err) {
     console.error(err);
@@ -89,13 +88,6 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize', 'pull_re
     await execLint(pr_owner, pr_repo, head_branch, pr_number)
   } else {
     console.log(`lint skipped`);
-    if (skipInTitle) {
-      try {
-        await approveWithComment('OI-wiki', 'OI-wiki', push.number, 'Lint skipped, unhappy :(');
-      } catch (err) {
-        console.error(err)
-      }
-    }
   }
 })
 
