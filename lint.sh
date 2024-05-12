@@ -4,6 +4,11 @@ set -xo pipefail
 echo $UID
 echo $USER
 echo $PATH
+
+which clang-format
+which ruff
+clang-format --version
+ruff --version
 # source /root/.bashrc
 
 num=$RANDOM
