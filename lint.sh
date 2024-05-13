@@ -33,6 +33,7 @@ git config --local user.email "15963390+24OI-bot@users.noreply.github.com"
 git config --local user.name "24OI-bot"
 
 find . -type f -name "*.cpp" -print0 | xargs -0 clang-format -i
+ruff format ./docs
 yarn run remark ./docs -o --silent
 # find . -type f -name "*.hpp" | xargs clang-format -i
 
