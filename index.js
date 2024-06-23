@@ -1,36 +1,24 @@
-require('log-timestamp');
-// const Octokit = require('@octokit/rest')()
-const { Octokit } = require("@octokit/core");
-const fetch = require('node-fetch');
-const remark = require('remark');
-
-// Octokit.authenticate({
-//   type: 'token',
-//   token: process.env.GH_TOKEN
-// })
+import 'log-timestamp';
+import { Octokit } from "@octokit/core";
+import fetch from 'node-fetch';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { createServer } from 'http';
+const asyncExec = promisify(exec);
 
 const octokit = new Octokit({
   auth: process.env.GH_TOKEN,
 });
 
 
-const { Webhooks, createNodeMiddleware } = require("@octokit/webhooks");
-// const { Webhooks } = require('@octokit/webhooks')
+import { Webhooks, createNodeMiddleware } from "@octokit/webhooks";
 const webhooks = new Webhooks({
   secret: process.env.WEBHOOK_SECRET
 })
 
-// webhooks.on('error', (error) => {
-//  console.log(`Error occured in "${error.event.name} handler: ${error.stack}"`)
-// })
-
 webhooks.onError((error) => {
   console.log(`Error occured in "${error.event.name} handler: ${error.stack}"`)
 })
-
-
-const { exec } = require('child_process');
-const asyncExec = require('util').promisify(exec);
 
 async function approveWithComment(owner, repo, number, comment) {
   await octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
@@ -133,7 +121,7 @@ webhooks.on(
 const port = 3000;
 
 const middleware = createNodeMiddleware(webhooks, { path: "/" });
-require("http").createServer()
+createServer()
   .on("error", (err) => {
     console.error(err);
   })

@@ -7,56 +7,24 @@
   "repository": "https://github.com/24OI/linter.git",
   "homepage": "https://github.com/24OI/linter",
   "bugs": "https://github.com/24OI/linter/issues",
+  "type": "module",
   "keywords": [
     "probot",
     "github",
     "probot-app"
   ],
   "scripts": {
-    "dev": "nodemon",
-    "start": "probot run ./index.js",
-    "lint": "standard --fix",
-    "test": "jest && standard",
-    "test:watch": "jest --watch --notify --notifyMode=change --coverage"
+    "start": "node ./index.js"
   },
   "dependencies": {
-    "@octokit/core": "^3.5.1",
-    "@octokit/rest": "^15.11.1",
-    "@octokit/webhooks": "9.0.0",
+    "@octokit/core": "^6.1.2",
+    "@octokit/rest": "^21.0.0",
+    "@octokit/webhooks": "^13.2.7",
     "log-timestamp": "^0.3.0",
-    "node-fetch": "^2.6.7",
-    "probot": "^7.0.0",
-    "remark": "^9.0.0",
-    "remark-cli": "^5.0.0",
-    "remark-lint": "^6.0.2",
-    "remark-lint-final-newline": "^1.0.2",
-    "remark-lint-no-tabs": "^1.0.2",
-    "remark-math": "^1.0.4",
-    "remark-pangu": "^1.0.1",
-    "remark-preset-lint-markdown-style-guide": "^2.1.2"
+    "node-fetch": "^2.6.7"
   },
-  "devDependencies": {
-    "jest": "^22.4.3",
-    "nodemon": "^1.17.2",
-    "smee-client": "^1.0.2",
-    "standard": "^10.0.3"
-  },
+  "devDependencies": {},
   "engines": {
     "node": ">= 8.3.0"
-  },
-  "standard": {
-    "env": [
-      "jest"
-    ]
-  },
-  "jest": {
-    "testEnvironment": "node"
-  },
-  "nodemonConfig": {
-    "exec": "npm start",
-    "watch": [
-      ".env",
-      "."
-    ]
   }
 }
