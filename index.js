@@ -129,13 +129,20 @@ createServer()
     console.log(`Listening on port ${port}`);
   })
   .on("request", async (req, res) => {
+    console.log(req.method, req.url);
     if (req.url === "/health") {
       res.statusCode = 200;
       res.end("Hello, world!");
-      res.end();
-    } else {
+    } else if (req.url === "/") {
+      // log each request with timestamp
       await middleware(req, res);
+    } else {
+      res.statusCode = 404;
+      res.end("Not Found");
     }
+  })
+  .on("close", () => {
+    console.log("Server closed");
   })
   .listen(port);
 

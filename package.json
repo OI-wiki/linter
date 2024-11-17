@@ -18,8 +18,8 @@
   },
   "dependencies": {
     "@octokit/core": "^6.1.2",
-    "@octokit/rest": "^21.0.0",
-    "@octokit/webhooks": "^13.2.7",
+    "@octokit/rest": "^21.0.2",
+    "@octokit/webhooks": "^13.3.0",
     "log-timestamp": "^0.3.0",
     "node-fetch": "^2.6.7"
   },

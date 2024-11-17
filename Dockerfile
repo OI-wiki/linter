@@ -1,5 +1,5 @@
 # 使用官方Node.js作为父镜像
-FROM node:18
+FROM node:20
 
 # Install git and clang-format==18.1.5 ruff==0.4.4 from pypi then clean up
 RUN apt-get update && \
