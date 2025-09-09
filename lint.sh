@@ -1,7 +1,7 @@
 #!/bin/bash
 export PATH=$PATH:~/.local/bin
 export PYTHONUNBUFFERED=1
-set -xo pipefail
+set -xeo pipefail
 echo $UID
 echo $USER
 echo $PATH
@@ -30,10 +30,22 @@ cd "$dir_name"
 # npm install .
 # yarn add .
 
+
 if [[ -f package-lock.json ]]; then
     npm install .
 else
-    yarn
+    n=0
+    until [ "$n" -ge 3 ]
+    do
+        yarn && break
+        n=$((n+1))
+        echo "yarn install 失败，重试第 $n 次..."
+        sleep 2
+    done
+    if [ "$n" -ge 3 ]; then
+        echo "yarn install 连续失败 3 次，脚本退出。"
+        exit 1
+    fi
 fi
 
 git config --local user.email "15963390+24OI-bot@users.noreply.github.com"
