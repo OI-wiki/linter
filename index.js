@@ -70,13 +70,28 @@ function getPrColor(prKey) {
   return prColors.get(prKey);
 }
 
+// 根据commit hash获取颜色
+function getCommitColor(commitHash) {
+  if (!commitHash) return '\x1b[90m'; // 灰色用于空hash
+  // 基于commit hash前6字符的哈希选择颜色
+  let hashValue = 0;
+  for (let i = 0; i < Math.min(6, commitHash.length); i++) {
+    hashValue = (hashValue << 5) - hashValue + commitHash.charCodeAt(i);
+    hashValue |= 0; // 转换为32位整数
+  }
+  const colorIndex = Math.abs(hashValue) % colorPool.length;
+  return colorPool[colorIndex];
+}
+
 async function execLint(owner, repo, branch, number, commitHash = '') {
   const prKey = `${owner}/${repo}#${number}`;
   const prColor = getPrColor(prKey);
+  const commitColor = getCommitColor(commitHash);
+  const commitDisplay = commitHash ? `@${commitHash.substring(0, 7)}` : '@unknown';
   
   // Cancel existing lint operation for the same PR if running
   if (runningLints.has(prKey)) {
-    console.log(`${prColor}[${prKey}]\x1b[0m \x1b[33m[CANCEL]\x1b[0m Cancelling existing lint operation`);
+    console.log(`${prColor}[${prKey}]\x1b[0m${commitColor}[${commitDisplay}]\x1b[0m \x1b[33m[CANCEL]\x1b[0m Cancelling existing lint operation`);
     const existingProcess = runningLints.get(prKey);
     try {
       existingProcess.kill('SIGTERM');
@@ -86,13 +101,13 @@ async function execLint(owner, repo, branch, number, commitHash = '') {
         existingProcess.kill('SIGKILL');
       }
     } catch (err) {
-      console.error(`${prColor}[${prKey}]\x1b[0m \x1b[31m[ERROR]\x1b[0m Error killing existing process:`, err);
+      console.error(`${prColor}[${prKey}]\x1b[0m${commitColor}[${commitDisplay}]\x1b[0m \x1b[31m[ERROR]\x1b[0m Error killing existing process:`, err);
     }
     runningLints.delete(prKey);
   }
 
   try {
-    console.log(`${prColor}[${prKey}]\x1b[0m \x1b[36m[START]\x1b[0m Starting lint process`);
+    console.log(`${prColor}[${prKey}]\x1b[0m${commitColor}[${commitDisplay}]\x1b[0m \x1b[36m[START]\x1b[0m Starting lint process`);
     
     // Create new process with improved tracking
     const childProcess = exec(`bash ./lint.sh ${owner} ${repo} ${branch} ${number} ${commitHash}`, {
@@ -108,15 +123,15 @@ async function execLint(owner, repo, branch, number, commitHash = '') {
     // Handle process completion
     childProcess.on('exit', (code, signal) => {
       if (code === 0) {
-        console.log(`${prColor}[${prKey}]\x1b[0m \x1b[32m[DONE]\x1b[0m Lint process completed successfully`);
+        console.log(`${prColor}[${prKey}]\x1b[0m${commitColor}[${commitDisplay}]\x1b[0m \x1b[32m[DONE]\x1b[0m Lint process completed successfully`);
       } else {
-        console.log(`${prColor}[${prKey}]\x1b[0m \x1b[31m[FAILED]\x1b[0m Lint process exited with code ${code}, signal ${signal}`);
+        console.log(`${prColor}[${prKey}]\x1b[0m${commitColor}[${commitDisplay}]\x1b[0m \x1b[31m[FAILED]\x1b[0m Lint process exited with code ${code}, signal ${signal}`);
       }
       runningLints.delete(prKey);
     });
     
     childProcess.on('error', (err) => {
-      console.error(`${prColor}[${prKey}]\x1b[0m \x1b[31m[ERROR]\x1b[0m Lint process error:`, err);
+      console.error(`${prColor}[${prKey}]\x1b[0m${commitColor}[${commitDisplay}]\x1b[0m \x1b[31m[ERROR]\x1b[0m Lint process error:`, err);
       runningLints.delete(prKey);
     });
     
@@ -130,7 +145,7 @@ async function execLint(owner, repo, branch, number, commitHash = '') {
         const lines = data.toString().split('\n');
         lines.forEach(line => {
           if (line.trim()) {
-            console.log(`${prColor}[${prKey}]\x1b[0m ${line}`);
+            console.log(`${prColor}[${prKey}]\x1b[0m${commitColor}[${commitDisplay}]\x1b[0m ${line}`);
           }
         });
       });
@@ -140,7 +155,7 @@ async function execLint(owner, repo, branch, number, commitHash = '') {
         const lines = data.toString().split('\n');
         lines.forEach(line => {
           if (line.trim()) {
-            console.error(`${prColor}[${prKey}]\x1b[0m ${line}`);
+            console.error(`${prColor}[${prKey}]\x1b[0m${commitColor}[${commitDisplay}]\x1b[0m ${line}`);
           }
         });
       });
@@ -156,10 +171,10 @@ async function execLint(owner, repo, branch, number, commitHash = '') {
       childProcess.on('error', reject);
     });
     
-    console.log(`${prColor}[${prKey}]\x1b[0m \x1b[32m[FINISH]\x1b[0m Lint completed successfully`);
+    console.log(`${prColor}[${prKey}]\x1b[0m${commitColor}[${commitDisplay}]\x1b[0m \x1b[32m[FINISH]\x1b[0m Lint completed successfully`);
     return true;
   } catch (err) {
-    console.error(`${prColor}[${prKey}]\x1b[0m \x1b[31m[ERROR]\x1b[0m Lint failed:`, err);
+    console.error(`${prColor}[${prKey}]\x1b[0m${commitColor}[${commitDisplay}]\x1b[0m \x1b[31m[ERROR]\x1b[0m Lint failed:`, err);
     runningLints.delete(prKey);
     return false;
   }
@@ -179,7 +194,9 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize', 'pull_re
     const head_branch = push.pull_request.head.ref;
     const pr_number = push.number;
     const commit_hash = push.pull_request.head.sha || '';
-    console.log(`lint starts ${pr_owner} ${pr_repo} ${head_branch} ${pr_number} ${commit_hash}`);
+    const commitColor = getCommitColor(commit_hash);
+    const commitDisplay = commit_hash ? `@${commit_hash.substring(0, 7)}` : '@unknown';
+    console.log(`${commitColor}[${commitDisplay}]\x1b[0m lint starts ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`);
     await execLint(pr_owner, pr_repo, head_branch, pr_number, commit_hash)
   } else {
     console.log(`lint skipped`);
@@ -213,10 +230,12 @@ webhooks.on(
       const pr_repo = json.head.repo.name;
       const head_branch = json.head.ref;
       const pr_number = json.number;
-      console.log(
-        `manual relint starts ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`
-      );
       const commit_hash = json.head.sha || '';
+      const commitColor = getCommitColor(commit_hash);
+      const commitDisplay = commit_hash ? `@${commit_hash.substring(0, 7)}` : '@unknown';
+      console.log(
+        `${commitColor}[${commitDisplay}]\x1b[0m manual relint starts ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`
+      );
       const success = await execLint(pr_owner, pr_repo, head_branch, pr_number, commit_hash);
       if (success) {
         try {
