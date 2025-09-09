@@ -6,6 +6,24 @@ import { promisify } from 'util';
 import { createServer } from 'http';
 const asyncExec = promisify(exec);
 
+// 颜色池 - 不同PR用不同颜色
+const colorPool = [
+  '\x1b[91m',  // 亮红
+  '\x1b[92m',  // 亮绿  
+  '\x1b[93m',  // 亮黄
+  '\x1b[94m',  // 亮蓝
+  '\x1b[95m',  // 亮紫
+  '\x1b[96m',  // 亮青
+  '\x1b[31m',  // 红色
+  '\x1b[32m',  // 绿色
+  '\x1b[33m',  // 黄色
+  '\x1b[34m',  // 蓝色
+  '\x1b[35m',  // 紫色
+  '\x1b[36m'   // 青色
+];
+
+const prColors = new Map(); // PR颜色映射
+
 const octokit = new Octokit({
   auth: process.env.GH_TOKEN,
 });
@@ -41,12 +59,24 @@ async function postReactions(owner, repo, comment_id, content) {
   })
 }
 
+// 根据PR number获取颜色
+function getPrColor(prKey) {
+  if (!prColors.has(prKey)) {
+    // 基于PR number哈希选择颜色
+    const prNumber = parseInt(prKey.split('#')[1]) || 0;
+    const colorIndex = prNumber % colorPool.length;
+    prColors.set(prKey, colorPool[colorIndex]);
+  }
+  return prColors.get(prKey);
+}
+
 async function execLint(owner, repo, branch, number, commitHash = '') {
   const prKey = `${owner}/${repo}#${number}`;
+  const prColor = getPrColor(prKey);
   
   // Cancel existing lint operation for the same PR if running
   if (runningLints.has(prKey)) {
-    console.log(`Cancelling existing lint operation for ${prKey}`);
+    console.log(`${prColor}[${prKey}]\x1b[0m \x1b[33m[CANCEL]\x1b[0m Cancelling existing lint operation`);
     const existingProcess = runningLints.get(prKey);
     try {
       existingProcess.kill('SIGTERM');
@@ -56,13 +86,13 @@ async function execLint(owner, repo, branch, number, commitHash = '') {
         existingProcess.kill('SIGKILL');
       }
     } catch (err) {
-      console.error(`Error killing existing process for ${prKey}:`, err);
+      console.error(`${prColor}[${prKey}]\x1b[0m \x1b[31m[ERROR]\x1b[0m Error killing existing process:`, err);
     }
     runningLints.delete(prKey);
   }
 
   try {
-    console.log(`Starting lint for ${prKey}`);
+    console.log(`${prColor}[${prKey}]\x1b[0m \x1b[36m[START]\x1b[0m Starting lint process`);
     
     // Create new process with improved tracking
     const childProcess = exec(`bash ./lint.sh ${owner} ${repo} ${branch} ${number} ${commitHash}`, {
@@ -77,12 +107,16 @@ async function execLint(owner, repo, branch, number, commitHash = '') {
     
     // Handle process completion
     childProcess.on('exit', (code, signal) => {
-      console.log(`Lint process for ${prKey} exited with code ${code}, signal ${signal}`);
+      if (code === 0) {
+        console.log(`${prColor}[${prKey}]\x1b[0m \x1b[32m[DONE]\x1b[0m Lint process completed successfully`);
+      } else {
+        console.log(`${prColor}[${prKey}]\x1b[0m \x1b[31m[FAILED]\x1b[0m Lint process exited with code ${code}, signal ${signal}`);
+      }
       runningLints.delete(prKey);
     });
     
     childProcess.on('error', (err) => {
-      console.error(`Lint process for ${prKey} error:`, err);
+      console.error(`${prColor}[${prKey}]\x1b[0m \x1b[31m[ERROR]\x1b[0m Lint process error:`, err);
       runningLints.delete(prKey);
     });
     
@@ -93,12 +127,22 @@ async function execLint(owner, repo, branch, number, commitHash = '') {
       
       childProcess.stdout.on('data', (data) => {
         stdout += data;
-        console.log(`[${prKey}] ${data.toString().trim()}`);
+        const lines = data.toString().split('\n');
+        lines.forEach(line => {
+          if (line.trim()) {
+            console.log(`${prColor}[${prKey}]\x1b[0m ${line}`);
+          }
+        });
       });
       
       childProcess.stderr.on('data', (data) => {
         stderr += data;
-        console.error(`[${prKey}] ${data.toString().trim()}`);
+        const lines = data.toString().split('\n');
+        lines.forEach(line => {
+          if (line.trim()) {
+            console.error(`${prColor}[${prKey}]\x1b[0m ${line}`);
+          }
+        });
       });
       
       childProcess.on('close', (code) => {
@@ -112,10 +156,10 @@ async function execLint(owner, repo, branch, number, commitHash = '') {
       childProcess.on('error', reject);
     });
     
-    console.log(`Lint finishes for ${prKey}`);
+    console.log(`${prColor}[${prKey}]\x1b[0m \x1b[32m[FINISH]\x1b[0m Lint completed successfully`);
     return true;
   } catch (err) {
-    console.error(`Lint failed for ${prKey}:`, err);
+    console.error(`${prColor}[${prKey}]\x1b[0m \x1b[31m[ERROR]\x1b[0m Lint failed:`, err);
     runningLints.delete(prKey);
     return false;
   }

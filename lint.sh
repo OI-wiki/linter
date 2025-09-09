@@ -1,5 +1,6 @@
 #!/bin/bash
 export PATH=$PATH:~/.local/bin
+export PYTHONUNBUFFERED=1
 set -xo pipefail
 echo $UID
 echo $USER
