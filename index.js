@@ -10,6 +10,8 @@ const octokit = new Octokit({
   auth: process.env.GH_TOKEN,
 });
 
+const runningLints = new Map();
+
 
 import { Webhooks, createNodeMiddleware } from "@octokit/webhooks";
 const webhooks = new Webhooks({
@@ -39,27 +41,87 @@ async function postReactions(owner, repo, comment_id, content) {
   })
 }
 
-async function execLint(owner, repo, branch, number) {
+async function execLint(owner, repo, branch, number, commitHash = '') {
+  const prKey = `${owner}/${repo}#${number}`;
+  
+  // Cancel existing lint operation for the same PR if running
+  if (runningLints.has(prKey)) {
+    console.log(`Cancelling existing lint operation for ${prKey}`);
+    const existingProcess = runningLints.get(prKey);
+    try {
+      existingProcess.kill('SIGTERM');
+      // Wait a bit for graceful shutdown
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!existingProcess.killed) {
+        existingProcess.kill('SIGKILL');
+      }
+    } catch (err) {
+      console.error(`Error killing existing process for ${prKey}:`, err);
+    }
+    runningLints.delete(prKey);
+  }
+
   try {
-    const { stdout, stderr } = await asyncExec(`bash ./lint.sh ${owner} ${repo} ${branch} ${number}`, {
+    console.log(`Starting lint for ${prKey}`);
+    
+    // Create new process with improved tracking
+    const childProcess = exec(`bash ./lint.sh ${owner} ${repo} ${branch} ${number} ${commitHash}`, {
       env: {
         'GH_TOKEN': process.env.GH_TOKEN,
         ...process.env
       }, uid: 0, maxBuffer: 1024 * 500
     });
-    console.log(`lint finishes for ${owner}/${repo}#${number}`);
-    console.log(stdout);
-    console.error(stderr);
+    
+    // Track the running process
+    runningLints.set(prKey, childProcess);
+    
+    // Handle process completion
+    childProcess.on('exit', (code, signal) => {
+      console.log(`Lint process for ${prKey} exited with code ${code}, signal ${signal}`);
+      runningLints.delete(prKey);
+    });
+    
+    childProcess.on('error', (err) => {
+      console.error(`Lint process for ${prKey} error:`, err);
+      runningLints.delete(prKey);
+    });
+    
+    // Wait for process to complete
+    await new Promise((resolve, reject) => {
+      let stdout = '';
+      let stderr = '';
+      
+      childProcess.stdout.on('data', (data) => {
+        stdout += data;
+        console.log(`[${prKey}] ${data.toString().trim()}`);
+      });
+      
+      childProcess.stderr.on('data', (data) => {
+        stderr += data;
+        console.error(`[${prKey}] ${data.toString().trim()}`);
+      });
+      
+      childProcess.on('close', (code) => {
+        if (code === 0) {
+          resolve();
+        } else {
+          reject(new Error(`Process exited with code ${code}`));
+        }
+      });
+      
+      childProcess.on('error', reject);
+    });
+    
+    console.log(`Lint finishes for ${prKey}`);
     return true;
   } catch (err) {
-    console.error(err);
+    console.error(`Lint failed for ${prKey}:`, err);
+    runningLints.delete(prKey);
     return false;
   }
 }
 
-let env_variables = 'PATH=' + process.env.PATH;
-
-webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize', 'pull_request.review_requested'], async ({ id, name, payload }) => {
+webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize', 'pull_request.review_requested'], async ({ name, payload }) => {
   const push = payload;
   const skipInTitle = push.pull_request.title.indexOf('[lint skip]') >= 0;
   const skipSelf = push.sender.login == "24OI-bot";
@@ -72,8 +134,9 @@ webhooks.on(['push', 'pull_request.opened', 'pull_request.synchronize', 'pull_re
     const pr_repo = push.pull_request.head.repo.name;
     const head_branch = push.pull_request.head.ref;
     const pr_number = push.number;
-    console.log(`lint starts ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`);
-    await execLint(pr_owner, pr_repo, head_branch, pr_number)
+    const commit_hash = push.pull_request.head.sha || '';
+    console.log(`lint starts ${pr_owner} ${pr_repo} ${head_branch} ${pr_number} ${commit_hash}`);
+    await execLint(pr_owner, pr_repo, head_branch, pr_number, commit_hash)
   } else {
     console.log(`lint skipped`);
   }
@@ -85,7 +148,7 @@ webhooks.on(
     "issue_comment.deleted",
     "issue_comment.edited",
   ],
-  async ({ id, name, payload }) => {
+  async ({ name, payload }) => {
     console.log(name, "issue event received");
     const comment_body = payload.comment.body;
     if (comment_body.includes("@24OI-bot") && comment_body.includes("please")) {
@@ -104,7 +167,8 @@ webhooks.on(
       console.log(
         `manual relint starts ${pr_owner} ${pr_repo} ${head_branch} ${pr_number}`
       );
-      const success = await execLint(pr_owner, pr_repo, head_branch, pr_number);
+      const commit_hash = json.head.sha || '';
+      const success = await execLint(pr_owner, pr_repo, head_branch, pr_number, commit_hash);
       if (success) {
         try {
           postReactions('OI-wiki', 'OI-wiki', payload.comment.id, '+1');

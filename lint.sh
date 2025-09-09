@@ -13,10 +13,14 @@ clang-format --version
 ruff --version
 # source /root/.bashrc
 
-num=$RANDOM
-git clone --depth=1 -b $3 https://github.com/$1/$2.git $num
+# Use pr-{pr-num}-{commit_hash} format for directory naming
+commit_short=$(echo "$5" | cut -c1-8)
+dir_name="pr-$4-$commit_short"
 
-cd $num
+echo "Cloning to directory: $dir_name"
+git clone --depth=1 -b $3 https://github.com/$1/$2.git "$dir_name"
+
+cd "$dir_name"
 
 # rm yarn.lock
 # rm package-lock.json
@@ -45,6 +49,6 @@ git remote add upd https://24OI-bot:$GH_TOKEN@github.com/$1/$2.git
 git push upd $3
 
 cd ..
-rm -rf $num
+rm -rf "$dir_name"
 yarn cache clean
 
