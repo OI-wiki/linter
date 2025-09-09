@@ -202,7 +202,12 @@ webhooks.on(
       } catch (err) {
         console.error(err)
       }
-      const text = await fetch(api_url).then((res) => res.text());
+      const text = await fetch(api_url, {
+        headers: {
+          'Authorization': `token ${process.env.GH_TOKEN}`,
+          'User-Agent': '24OI-bot'
+        }
+      }).then((res) => res.text());
       const json = JSON.parse(text);
       const pr_owner = json.head.user.login;
       const pr_repo = json.head.repo.name;
