@@ -51,10 +51,11 @@ fi
 git config --local user.email "15963390+24OI-bot@users.noreply.github.com"
 git config --local user.name "24OI-bot"
 
-python3 scripts/fix_details.py ./docs
+python3 scripts/linter_patch.py ./docs --mode pre
 find . -type f \( -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) -print0 | xargs -0 clang-format -i
 ruff format ./docs
 yarn run remark ./docs -o --silent
+python3 scripts/linter_patch.py ./docs --mode post
 
 git add ./docs
 git commit -m 'style: format markdown files with remark-lint'
